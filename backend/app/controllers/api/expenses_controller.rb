@@ -1,7 +1,6 @@
 class Api::ExpensesController < ApplicationController
   def index
-    # FIX: sort by expense date (date), not created_at
-    # because we want the latest expenses based on actual expense date
+    # sort by expense date instead of created_at
     expenses = Expense.includes(:category).order(date: :desc)
 
     if params[:year].present? && params[:month].present?
@@ -11,12 +10,10 @@ class Api::ExpensesController < ApplicationController
       start_date = Date.new(year, month, 1)
       end_date = start_date.end_of_month
 
-      # ✅ FIX: filter using expense date
-      # before it used created_at (wrong), now we use date (correct)
+      # filter using expense date
       expenses = expenses.where(date: start_date..end_date)
     end
 
-    # return formatted data
     render json: expenses.map { |expense| format_expense(expense) }
   end
 
